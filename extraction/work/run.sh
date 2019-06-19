@@ -4,4 +4,5 @@ bert-base-ner-train \
     -output_dir out_dir/ \
     -init_checkpoint init_checkpoint/bert_model.ckpt \
     -bert_config_file init_checkpoint/bert_config.json \
-    -vocab_file init_checkpoint/vocab.txt
+    -vocab_file init_checkpoint/vocab.txt \
+    -verbose

@@ -1,7 +1,8 @@
 import pandas
+import numpy as np
 from sklearn.model_selection import train_test_split
 
-from extraction.util import find_locations
+from extraction.util import find_locations, random_rows
 
 LABEL_BEGIN = 'B-LBL'
 LABEL_MIDDLE = 'I-LBL'
@@ -56,8 +57,16 @@ with open('extraction/work/data_dir/train.txt', 'w') as f:
     for sentence, labels in zip(X_train, y_train):
         for c, l in zip(sentence, labels):
             f.write(c + ' ' + l + '\n')
+        f.write('\n')
 
 with open('extraction/work/data_dir/dev.txt', 'w') as f:
     for sentence, labels in zip(X_test, y_test):
         for c, l in zip(sentence, labels):
             f.write(c + ' ' + l + '\n')
+        f.write('\n')
+
+with open('extraction/work/data_dir/test.txt', 'w') as f:
+    for sentence, labels in random_rows(np.array([data['desc_clean'], full_marks]).transpose(), 100):
+        for c, l in zip(sentence, labels):
+            f.write(c + ' ' + l + '\n')
+        f.write('\n')
