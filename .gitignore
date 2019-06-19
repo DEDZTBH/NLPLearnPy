@@ -194,4 +194,9 @@ fabric.properties
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
 
-.idea
+.idea/
+*.csv
+
+extraction/work/data_dir
+extraction/work/init_checkpoint
+extraction/work/out_dir
