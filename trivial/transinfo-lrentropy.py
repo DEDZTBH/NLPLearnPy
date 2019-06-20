@@ -1,5 +1,4 @@
-import jieba.analyse
-from helper import is_valid
+from trivial.helper import is_valid
 
 # Learning from
 # http://www.hankcs.com/nlp/extraction-and-identification-of-mutual-information-about-the-phrase-based-on-information
