@@ -197,6 +197,6 @@ fabric.properties
 .idea/
 *.csv
 
-extraction/work/data_dir
-extraction/work/init_checkpoint
-extraction/work/out_dir
+bert-bilstm-crf-ner/work/data_dir
+bert-bilstm-crf-ner/work/init_checkpoint
+bert-bilstm-crf-ner/work/out_dir

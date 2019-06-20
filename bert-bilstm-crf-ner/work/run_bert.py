@@ -11,6 +11,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+import tensorflow as tf
 
 
 def start_server():
@@ -30,14 +31,15 @@ def train_ner():
     from bert_base.train.bert_lstm_ner import train
 
     args = get_args_parser()
-
+    args.label_list = 'data_dir/labels.txt'
+    args.max_seq_length = 128
     args.init_checkpoint = 'init_checkpoint/bert_model.ckpt'
-    args.label_list = 'B-LBL, I-LBL'
     args.data_dir = 'data_dir/'
     args.output_dir = 'out_dir/'
     args.bert_config_file = 'init_checkpoint/bert_config.json'
     args.vocab_file = 'init_checkpoint/vocab.txt'
     args.verbose = True
+    args.learning_rate = 10e-6
 
     if True:
         import sys
@@ -45,6 +47,7 @@ def train_ner():
         print('usage: %s\n%20s   %s\n%s\n%s\n' % (' '.join(sys.argv), 'ARG', 'VALUE', '_' * 50, param_str))
     print(args)
     os.environ['CUDA_VISIBLE_DEVICES'] = args.device_map
+    tf.logging.set_verbosity(tf.logging.INFO)
     train(args=args)
 
 

@@ -1,11 +1,20 @@
 import pandas
 import numpy as np
 from sklearn.model_selection import train_test_split
+import re
 
-from extraction.util import find_locations, random_rows
+from util import find_locations, random_rows
+
+with open('data/stopwords2.txt', 'r') as file:
+    stop_words = file.read().split('\n')
+stop_words.sort(key=lambda x: len(x), reverse=True)
 
 LABEL_BEGIN = 'B-LBL'
 LABEL_MIDDLE = 'I-LBL'
+with open('bert-bilstm-crf-ner/work/data_dir/labels.txt', 'w') as f:
+    f.write(LABEL_BEGIN)
+    f.write("\n")
+    f.write(LABEL_MIDDLE)
 
 data = pandas.read_csv("data/tiny_label.csv", delimiter="	")
 data = data[['desc_clean', 'labels']]
@@ -20,6 +29,13 @@ def valid_label(l):
 
 data['labels'] = [list(filter(valid_label, eval(l))) for l in data['labels']]
 
+# limit dataset
+data = data.head(256)
+
+for sw in stop_words:
+    for i, str in enumerate(data['desc_clean']):
+        data['desc_clean'][i] = re.sub(r'[-]{3,}|[*]{3,}', '', str.replace(sw, ''))
+
 full_marks = []
 
 for x, y in zip(data['desc_clean'], data['labels']):
@@ -27,6 +43,8 @@ for x, y in zip(data['desc_clean'], data['labels']):
     y.sort(key=lambda x: len(x), reverse=True)
     for label in y:
         found_locs = list(find_locations(x, label))
+        if len(found_locs) == 0:
+            print(label + ' not found in ' + x)
         for found_location in found_locs:
             if full_marks[-1][found_location] == 'O':
                 full_marks[-1][found_location] = LABEL_BEGIN
@@ -51,22 +69,22 @@ for x, y in zip(data['desc_clean'], data['labels']):
                         # print(x[i])
                         # print(full_marks[-1][i])
 
-X_train, X_test, y_train, y_test = train_test_split(data['desc_clean'], full_marks, test_size=0.15)
+X_train, X_test, y_train, y_test = train_test_split(data['desc_clean'], full_marks, test_size=0.1)
 
-with open('extraction/work/data_dir/train.txt', 'w') as f:
+with open('bert-bilstm-crf-ner/work/data_dir/train.txt', 'w') as f:
     for sentence, labels in zip(X_train, y_train):
         for c, l in zip(sentence, labels):
             f.write(c + ' ' + l + '\n')
         f.write('\n')
 
-with open('extraction/work/data_dir/dev.txt', 'w') as f:
+with open('bert-bilstm-crf-ner/work/data_dir/dev.txt', 'w') as f:
     for sentence, labels in zip(X_test, y_test):
         for c, l in zip(sentence, labels):
             f.write(c + ' ' + l + '\n')
         f.write('\n')
 
-with open('extraction/work/data_dir/test.txt', 'w') as f:
-    for sentence, labels in random_rows(np.array([data['desc_clean'], full_marks]).transpose(), 100):
+with open('bert-bilstm-crf-ner/work/data_dir/test.txt', 'w') as f:
+    for sentence, labels in random_rows(np.array([data['desc_clean'], full_marks]).transpose(), 10):
         for c, l in zip(sentence, labels):
             f.write(c + ' ' + l + '\n')
         f.write('\n')
