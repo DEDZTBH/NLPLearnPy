@@ -12,6 +12,7 @@ with open('data/stopwords.txt', 'r', encoding='utf-8') as file:
 data = pandas.read_csv("data/tiny_label.csv", delimiter="	")
 data = data[['desc_clean', 'labels']]
 
+
 def valid_label(l):
     if len(l) <= 1:
         # print('invalid label removed:' + l)
