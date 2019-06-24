@@ -11,11 +11,11 @@ from util import find_locations, random_rows
 
 LABEL_BEGIN = 'B-LBL'
 LABEL_MIDDLE = 'I-LBL'
-LABEL_END = 'E-LBL'
+LABEL_END = 'I-LBL'
 
-data = pandas.read_csv("data/tiny_label.csv", delimiter="	")
+data = pandas.read_csv("data/tiny_label.csv", delimiter="	", index_col="jd.jd_id")
+data = data.loc[~data.index.duplicated(keep='first')]
 data = data[['desc_clean', 'labels']]
-
 
 def valid_label(l):
     if len(l) <= 1:
@@ -27,7 +27,8 @@ def valid_label(l):
 data['labels'] = [list(filter(valid_label, eval(l))) for l in data['labels']]
 
 # limit dataset
-data2 = data.head(256).copy(deep=True)
+data2 = data.head(1000).copy(deep=True)
+# data2 = data
 
 for i in range(len(data2['desc_clean'])):
     # for sw in stop_words:
@@ -36,6 +37,7 @@ for i in range(len(data2['desc_clean'])):
     # data['desc_clean'][i] = re.sub(r'[0-9、]+', ' ', data['desc_clean'][i])
     data2['desc_clean'][i] = re.sub(r'[-]{3,}|[*]{3,}', '', data2['desc_clean'][i])
     # data['desc_clean'][i] = re.sub(r'【.*?】', '', data['desc_clean'][i])
+    data2['desc_clean'][i] = re.sub(r' ', '', data2['desc_clean'][i])
 
 full_marks = []
 
@@ -73,7 +75,10 @@ for x, y in zip(data2['desc_clean'], data2['labels']):
                             pass
 
 X_train, X_test, y_train, y_test = train_test_split(np.array(data2['desc_clean']), np.array(full_marks), test_size=0.1)
-
+# X_train = []
+# y_train = []
+# X_test = np.array(data2['desc_clean'])
+# y_test = np.array(full_marks)
 
 def get_my_data():
     return X_train, X_test, y_train, y_test
@@ -87,9 +92,10 @@ def export_my_data(every_sentence=True):
         with open(fileloc, 'w+', encoding='utf-8') as f:
             for sentence, labels in z:
                 for c, l in zip(sentence, labels):
-                    f.write(c + '\t' + l + '\n')
-                    if every_sentence and c in sentence_break:
-                        f.write('\n')
+                    if c.strip() != '':
+                        f.write(c + '\t' + l + '\n')
+                        if every_sentence and c in sentence_break:
+                            f.write('\n')
                 if not every_sentence:
                     f.write('\n')
 
