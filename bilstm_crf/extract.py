@@ -14,8 +14,10 @@ LABEL_MIDDLE = 'I-LBL'
 LABEL_END = 'I-LBL'
 
 data = pandas.read_csv("data/tiny_label.csv", delimiter="	", index_col="jd.jd_id")
+# remove duplicate index
 data = data.loc[~data.index.duplicated(keep='first')]
 data = data[['desc_clean', 'labels']]
+
 
 def valid_label(l):
     if len(l) <= 1:
@@ -26,18 +28,22 @@ def valid_label(l):
 
 data['labels'] = [list(filter(valid_label, eval(l))) for l in data['labels']]
 
+print('Total # of samples: {}'.format(len(data)))
+
 # limit dataset
 data2 = data.head(1000).copy(deep=True)
+
+
 # data2 = data
 
-for i in range(len(data2['desc_clean'])):
-    # for sw in stop_words:
-    #     data['desc_clean'][i] = data['desc_clean'][i].replace(sw, '')
-    # data['desc_clean'][i] = re.sub(r'[0-9一二三四五六七八九][.、]', ' ', data['desc_clean'][i])
-    # data['desc_clean'][i] = re.sub(r'[0-9、]+', ' ', data['desc_clean'][i])
-    data2['desc_clean'][i] = re.sub(r'[-]{3,}|[*]{3,}', '', data2['desc_clean'][i])
-    # data['desc_clean'][i] = re.sub(r'【.*?】', '', data['desc_clean'][i])
-    data2['desc_clean'][i] = re.sub(r' ', '', data2['desc_clean'][i])
+def desc_clean_clean(s):
+    s = re.sub(r'[0-9一二三四五六七八九][.、]', ' ', s)
+    s = re.sub(r'[-]{3,}|[*]{3,}', '', s)
+    s = re.sub(r' ', '', s)
+    return s
+
+
+data2['desc_clean'] = data2['desc_clean'].map(desc_clean_clean)
 
 full_marks = []
 
@@ -75,6 +81,8 @@ for x, y in zip(data2['desc_clean'], data2['labels']):
                             pass
 
 X_train, X_test, y_train, y_test = train_test_split(np.array(data2['desc_clean']), np.array(full_marks), test_size=0.1)
+
+
 # X_train = []
 # y_train = []
 # X_test = np.array(data2['desc_clean'])
@@ -88,20 +96,27 @@ sentence_break = list('。；！.;!')
 
 
 def export_my_data(every_sentence=True):
-    def writeToFile(fileloc, z):
+    def write_to_file(fileloc, z):
         with open(fileloc, 'w+', encoding='utf-8') as f:
+            prev_is_new_line = False
             for sentence, labels in z:
                 for c, l in zip(sentence, labels):
                     if c.strip() != '':
-                        f.write(c + '\t' + l + '\n')
-                        if every_sentence and c in sentence_break:
-                            f.write('\n')
+                        sentence_is_ending = every_sentence and c in sentence_break
+                        if prev_is_new_line and sentence_is_ending:
+                            prev_is_new_line = False
+                        else:
+                            f.write(c + '\t' + l + '\n')
+                            if sentence_is_ending:
+                                f.write('\n')
+                                prev_is_new_line = True
+                            else:
+                                prev_is_new_line = False
                 if not every_sentence:
                     f.write('\n')
 
-    writeToFile('bilstm_crf/data_dir/train_data', zip(X_train, y_train))
-    writeToFile('bilstm_crf/data_dir/test_data', zip(X_test, y_test))
-    # writeToFile('bilstm_crf/data_dir/test.txt', random_rows(np.array([data2['desc_clean'], full_marks]).transpose(), 5))
+    write_to_file('bilstm_crf/data_dir/train_data', zip(X_train, y_train))
+    write_to_file('bilstm_crf/data_dir/test_data', zip(X_test, y_test))
 
 
 if __name__ == '__main__':
