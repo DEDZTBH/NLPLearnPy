@@ -2,12 +2,12 @@ import pandas
 from sklearn.model_selection import train_test_split
 import re
 import numpy as np
+import jieba
+import jieba.posseg as pseg
+import pickle
 
-from util import find_locations, random_rows
+from util import find_locations
 
-# with open('data/stopwords2.txt', 'r', encoding='utf-8') as file:
-#     stop_words = file.read().split('\n')
-# stop_words.sort(key=lambda x: len(x), reverse=True)
 
 LABEL_BEGIN = 'B-LBL'
 LABEL_MIDDLE = 'I-LBL'
@@ -28,6 +28,13 @@ def valid_label(l):
 
 data['labels'] = [list(filter(valid_label, eval(l))) for l in data['labels']]
 
+labels_set = set()
+for label_list in data['labels']:
+    for label in label_list:
+        labels_set.add(label)
+for label in labels_set:
+    jieba.add_word(label)
+
 print('Total # of samples: {}'.format(len(data)))
 
 # limit dataset
@@ -45,6 +52,12 @@ def desc_clean_clean(s):
 data2['desc_clean'] = data2['desc_clean'].map(desc_clean_clean)
 
 full_marks = []
+
+# x, y = list(zip(data2['desc_clean'], data2['labels']))[0]
+
+marks_set = {
+    LABEL_BEGIN, LABEL_MIDDLE, LABEL_END
+}
 
 for x, y in zip(data2['desc_clean'], data2['labels']):
     full_marks.append(['O'] * len(x))
@@ -78,6 +91,27 @@ for x, y in zip(data2['desc_clean'], data2['labels']):
                             full_marks[-1][i] = LABEL_MIDDLE
                         else:
                             pass
+
+    seg_result = pseg.cut(x)
+    seg_word = ''
+    properti = ''
+    begin = True
+    for i, ch in enumerate(x):
+        if seg_word == '':
+            seg_word, properti = next(seg_result)
+            begin = True
+        if begin:
+            mark_prefix = 'B-'
+            begin = False
+        else:
+            mark_prefix = 'I-'
+        if seg_word[0] == ch:
+            mark = mark_prefix + properti.upper()
+            if full_marks[-1][i] == 'O':
+                full_marks[-1][i] = mark
+                marks_set.add(mark)
+            seg_word = seg_word[1:]
+
 
 X_train, X_test, y_train, y_test = train_test_split(np.array(data2['desc_clean']), np.array(full_marks), test_size=0.1)
 
@@ -128,3 +162,12 @@ def export_my_data(every_sentence=True):
 if __name__ == '__main__':
     # pass
     train_results, test_results = export_my_data()
+
+tag2label = {
+    'O': 0
+}
+for i, lbl in enumerate(marks_set):
+    tag2label[lbl] = i + 1
+print(tag2label)
+with open('bilstm_crf/data_dir/tag2label.pkl', 'wb+') as f:
+    pickle.dump(tag2label, f)

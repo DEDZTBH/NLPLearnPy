@@ -32,14 +32,12 @@ def train_ner():
 
     args = get_args_parser()
     args.label_list = 'data_dir/labels.txt'
-    args.max_seq_length = 128
-    args.init_checkpoint = 'init_checkpoint/bert_model.ckpt'
+    args.init_checkpoint = 'init_checkpoint_m/bert_model.ckpt'
     args.data_dir = 'data_dir/'
     args.output_dir = 'out_dir/'
-    args.bert_config_file = 'init_checkpoint/bert_config.json'
-    args.vocab_file = 'init_checkpoint/vocab.txt'
+    args.bert_config_file = 'init_checkpoint_m/bert_config.json'
+    args.vocab_file = 'init_checkpoint_m/vocab.txt'
     args.verbose = True
-    args.learning_rate = 10e-6
 
     if True:
         import sys
