@@ -1,8 +1,8 @@
 import pandas
 from sklearn.model_selection import train_test_split
-import re
 import numpy as np
 
+from extract_util import desc_clean_clean, valid_label, write_to_file
 from util import find_locations, random_rows
 
 # with open('data/stopwords2.txt', 'r', encoding='utf-8') as file:
@@ -18,14 +18,6 @@ data = pandas.read_csv("data/tiny_label.csv", delimiter="	", index_col="jd.jd_id
 data = data.loc[~data.index.duplicated(keep='first')]
 data = data[['desc_clean', 'labels']]
 
-
-def valid_label(l):
-    if len(l) <= 1:
-        # print('invalid label removed:' + l)
-        return False
-    return True
-
-
 data['labels'] = [list(filter(valid_label, eval(l))) for l in data['labels']]
 
 print('Total # of samples: {}'.format(len(data)))
@@ -33,14 +25,6 @@ print('Total # of samples: {}'.format(len(data)))
 # limit dataset
 # data2 = data.head(1000).copy(deep=True)
 data2 = data
-
-
-def desc_clean_clean(s):
-    s = re.sub(r'[0-9一二三四五六七八九][.、]', ' ', s)
-    s = re.sub(r'[-]{3,}|[*]{3,}', '', s)
-    s = re.sub(r' ', '', s)
-    return s
-
 
 data2['desc_clean'] = data2['desc_clean'].map(desc_clean_clean)
 
@@ -94,32 +78,7 @@ def get_my_data():
 sentence_break = list('。；！.;!')
 
 
-def export_my_data(every_sentence=True):
-    def write_to_file(fileloc, z):
-        sentences_record = []
-        with open(fileloc, 'w+', encoding='utf-8') as f:
-            prev_is_new_line = False
-            for sentence, labels in z:
-                sentence_record = ''
-                for c, l in zip(sentence, labels):
-                    if c.strip() != '':
-                        sentence_is_ending = every_sentence and c in sentence_break
-                        if prev_is_new_line and sentence_is_ending:
-                            prev_is_new_line = False
-                        else:
-                            f.write(c + '\t' + l + '\n')
-                            sentence_record += c
-                            if sentence_is_ending:
-                                f.write('\n')
-                                sentences_record.append(sentence_record)
-                                sentence_record = ''
-                                prev_is_new_line = True
-                            else:
-                                prev_is_new_line = False
-                if not every_sentence:
-                    f.write('\n')
-        return sentences_record
-
+def export_my_data():
     train_results = write_to_file('bilstm_crf/data_dir/train_data', zip(X_train, y_train))
     test_results = write_to_file('bilstm_crf/data_dir/test_data', zip(X_test, y_test))
     return train_results, test_results
