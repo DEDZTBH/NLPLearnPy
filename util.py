@@ -12,6 +12,10 @@ def find_locations(str, substr):
         start += len(substr)
 
 
+def a2g(x):
+    return (n for n in x)
+
+
 def random_rows(A, num_rows, replace=False):
     return A[np.random.choice(A.shape[0], num_rows, replace=replace), :]
 

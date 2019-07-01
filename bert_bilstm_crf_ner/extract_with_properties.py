@@ -4,7 +4,6 @@ import re
 import numpy as np
 import jieba
 import jieba.posseg as pseg
-import pickle
 
 from util import find_locations, a2g
 
@@ -158,7 +157,7 @@ def export_my_data(every_sentence=True):
                         if prev_is_new_line and sentence_is_ending:
                             prev_is_new_line = False
                         else:
-                            f.write(c + '\t' + l + '\n')
+                            f.write(c + ' ' + l + '\n')
                             sentence_record += c
                             if sentence_is_ending:
                                 f.write('\n')
@@ -171,8 +170,9 @@ def export_my_data(every_sentence=True):
                     f.write('\n')
         return sentences_record
 
-    train_results = write_to_file('bilstm_crf/data_dir/train_data', zip(X_train, y_train))
-    test_results = write_to_file('bilstm_crf/data_dir/test_data', zip(X_test, y_test))
+    train_results = write_to_file('bert_bilstm_crf_ner/work/data_dir/train.txt', zip(X_train, y_train))
+    test_results = write_to_file('bert_bilstm_crf_ner/work/data_dir/dev.txt', zip(X_test, y_test))
+    write_to_file('bert_bilstm_crf_ner/work/data_dir/test.txt', zip([], []))
     return train_results, test_results
 
 
@@ -180,11 +180,7 @@ if __name__ == '__main__':
     # pass
     train_results, test_results = export_my_data()
 
-    tag2label = {
-        'O': 0
-    }
-    for i, lbl in enumerate(marks_set):
-        tag2label[lbl] = i + 1
-    print(tag2label)
-    with open('bilstm_crf/data_dir/tag2label.pkl', 'wb+') as f:
-        pickle.dump(tag2label, f)
+    with open('bert_bilstm_crf_ner/work/data_dir/labels.txt', 'w+', encoding="utf-8") as f:
+        for lbl in marks_set:
+            f.write(lbl)
+            f.write('\n')

@@ -24,6 +24,7 @@ def start_server():
     server.start()
     server.join()
 
+prefix = ''
 
 def train_ner():
     import os
@@ -31,13 +32,15 @@ def train_ner():
     from bert_base.train.bert_lstm_ner import train
 
     args = get_args_parser()
-    args.label_list = 'data_dir/labels.txt'
-    args.init_checkpoint = 'init_checkpoint_m/bert_model.ckpt'
-    args.data_dir = 'data_dir/'
+    args.label_list = prefix + 'data_dir/labels.txt'
+    args.init_checkpoint = prefix + 'init_checkpoint/bert_model.ckpt'
+    args.data_dir = prefix + 'data_dir/'
     args.output_dir = 'out_dir/'
-    args.bert_config_file = 'init_checkpoint_m/bert_config.json'
-    args.vocab_file = 'init_checkpoint_m/vocab.txt'
+    args.bert_config_file = prefix + 'init_checkpoint/bert_config.json'
+    args.vocab_file = prefix + 'init_checkpoint/vocab.txt'
     args.verbose = True
+    args.gpu_memory_fraction = 1.0
+    args.do_predict = False
 
     if True:
         import sys
