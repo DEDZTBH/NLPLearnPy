@@ -3,7 +3,8 @@ import jieba.posseg as pseg
 
 with open('data/stopwords.txt', 'r', encoding='utf-8') as file:
     stop_words = file.read().split('\n')
-stop_properties = ['uj']
+stop_properties = []
+stop_properties_general = list('efumoqy')
 
 
 def valid_label(l):
@@ -14,7 +15,7 @@ def valid_label(l):
 
 
 def desc_clean_clean(s):
-    s = re.sub(r'[0-9一二三四五六七八九][.、]', ' ', s)
+    s = re.sub(r'[0-9一二三四五六七八九][.、:：]', ' ', s)
     s = re.sub(r'[-]{3,}|[*]{3,}', '', s)
     s = re.sub(r' ', '', s)
     return s
@@ -22,7 +23,8 @@ def desc_clean_clean(s):
 
 def filter_seg_result(pair):
     seg_word, properti = pair
-    return (seg_word not in stop_words) and (properti not in stop_properties)
+    return (seg_word not in stop_words) and (properti not in stop_properties) \
+           and (simplify_property(properti) not in stop_properties_general)
 
 
 sentence_break = list('。；！.;!')
@@ -55,7 +57,6 @@ def write_to_file(fileloc, z, every_sentence=True):
 
 
 def preprocess_input_with_properties(strs, split=False):
-
     def filter_words(x):
         seg_result = list(filter(filter_seg_result, pseg.cut(x)))
         return ''.join([w for w, p in seg_result])
