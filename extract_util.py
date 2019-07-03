@@ -70,3 +70,10 @@ def preprocess_input_with_properties(strs, split=False):
     strs = [clean_desc(s) for s in strs]
 
     return strs
+
+
+def simplify_property(p):
+    if p.upper() == 'ENG':
+        return p
+
+    return p[0]

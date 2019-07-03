@@ -4,7 +4,7 @@ import numpy as np
 import jieba
 import jieba.posseg as pseg
 
-from extract_util import desc_clean_clean, valid_label, filter_seg_result, write_to_file
+from extract_util import desc_clean_clean, valid_label, filter_seg_result, write_to_file, simplify_property
 from util import find_locations, a2g
 
 with open('data/stopwords.txt', 'r', encoding='utf-8') as file:
@@ -94,6 +94,11 @@ for x, y in zip(data2['desc_clean'], data2['labels']):
     for i, ch in enumerate(x):
         if seg_word == '':
             seg_word, properti = next(seg_result)
+            # simplify
+
+            properti = simplify_property(properti)
+
+
             begin = True
         if begin:
             mark_prefix = 'B-'

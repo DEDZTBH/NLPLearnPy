@@ -1,3 +1,5 @@
+import pickle
+
 import pandas
 from sklearn.model_selection import train_test_split
 import numpy as np
@@ -63,7 +65,7 @@ for x, y in zip(data2['desc_clean'], data2['labels']):
                         else:
                             pass
 
-X_train, X_test, y_train, y_test = train_test_split(np.array(data2['desc_clean']), np.array(full_marks), test_size=0.1)
+X_train, X_test, y_train, y_test = train_test_split(np.array(data2['desc_clean']), np.array(full_marks), test_size=0.15)
 
 
 # X_train = []
@@ -87,3 +89,12 @@ def export_my_data():
 if __name__ == '__main__':
     # pass
     train_results, test_results = export_my_data()
+
+    tag2label = {
+        'O': 0
+    }
+    marks_set = {LABEL_BEGIN, LABEL_MIDDLE, LABEL_END}
+    for i, lbl in enumerate(marks_set):
+        tag2label[lbl] = i + 1
+    with open('bilstm_crf/data_dir/tag2label.pkl', 'wb+') as f:
+        pickle.dump(tag2label, f)
