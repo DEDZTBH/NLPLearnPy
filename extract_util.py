@@ -54,7 +54,7 @@ def write_to_file(fileloc, z, every_sentence=True):
     return sentences_record
 
 
-def preprocess_input_with_properties(strs):
+def preprocess_input_with_properties(strs, split=False):
 
     def filter_words(x):
         seg_result = list(filter(filter_seg_result, pseg.cut(x)))
@@ -63,7 +63,8 @@ def preprocess_input_with_properties(strs):
     def clean_desc(s):
         s = desc_clean_clean(s)
         s = filter_words(s)
-        s = list(filter(lambda x: x != '', re.split(r'[。；！.;!]', s)))
+        if split:
+            s = list(filter(lambda x: x != '', re.split(r'[。；！.;!]', s)))
         return s
 
     strs = [clean_desc(s) for s in strs]

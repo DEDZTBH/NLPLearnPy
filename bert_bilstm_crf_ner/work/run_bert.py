@@ -41,8 +41,8 @@ def train_ner():
     args.verbose = True
     args.gpu_memory_fraction = 1.0
     args.do_predict = False
-    args.save_checkpoints_steps = 5000
-    args.save_summary_steps = 5000
+    # args.save_checkpoints_steps = 5000
+    # args.save_summary_steps = 5000
     args.clean = True
 
     if True:
