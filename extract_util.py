@@ -74,7 +74,7 @@ def preprocess_input_with_properties(strs, split=False):
 
 
 def simplify_property(p):
-    if p.upper() == 'ENG':
+    if p == 'eng':
         return p
 
     return p[0]
