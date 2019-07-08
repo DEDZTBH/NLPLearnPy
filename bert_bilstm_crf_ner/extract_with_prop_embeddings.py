@@ -3,8 +3,9 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 import jieba.posseg as pseg
 import pickle
+from shutil import copyfile
 
-from extract_util import desc_clean_clean, filter_seg_result, valid_label, write_to_file, simplify_property
+from extract_util import desc_clean_clean, filter_seg_result, valid_label, simplify_property
 from util import find_locations, a2g
 
 LABEL_BEGIN = 'B-LBL'
@@ -144,8 +145,9 @@ def export_my_data():
                     f.write('\n')
         return sentences_record, propss_record
 
-    train_results = write_to_file_w_prop('bilstm_crf/data_dir/train_data', zip(X_train, y_train))
-    test_results = write_to_file_w_prop('bilstm_crf/data_dir/test_data', zip(X_test, y_test))
+    train_results = write_to_file_w_prop('bert_bilstm_crf_ner/work/data_dir/train.txt', zip(X_train, y_train))
+    test_results = write_to_file_w_prop('bert_bilstm_crf_ner/work/data_dir/dev.txt', zip(X_test, y_test))
+    copyfile('bert_bilstm_crf_ner/work/data_dir/dev.txt', 'bert_bilstm_crf_ner/work/data_dir/test.txt')
     return train_results, test_results
 
 
@@ -159,5 +161,5 @@ if __name__ == '__main__':
     for i, lbl in enumerate(prop_set):
         prop2label[lbl] = i + 1
     print(prop2label)
-    with open('bilstm_crf/data_dir/prop2label.pkl', 'wb+') as f:
+    with open('bert_bilstm_crf_ner/work/data_dir/prop2label.pkl', 'wb+') as f:
         pickle.dump(prop2label, f)

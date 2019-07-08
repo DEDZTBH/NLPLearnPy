@@ -1,5 +1,5 @@
 import time
-from bert_base.client import BertClient
+from bert_base_skill_tag.client import BertClient
 
 from extract_util import preprocess_input_with_properties
 
