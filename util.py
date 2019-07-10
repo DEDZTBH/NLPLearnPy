@@ -45,3 +45,15 @@ def load_or_create(filename, ext='pkl', create_fn=None, folder='data', with_stat
         return status, magic_obj
     else:
         return magic_obj
+
+
+def tuple_array_to_ndarray(tuple_array):
+    return tuple_array_transpose(tuple_array)
+
+
+def ndarray_to_tuple_array(ndarray):
+    return tuple_array_transpose(ndarray)
+
+
+def tuple_array_transpose(m):
+    return list(zip(*m))

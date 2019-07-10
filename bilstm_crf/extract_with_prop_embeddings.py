@@ -11,6 +11,8 @@ LABEL_BEGIN = 'B-LBL'
 LABEL_MIDDLE = 'I-LBL'
 LABEL_END = 'I-LBL'
 
+upper_english = False
+
 data = pandas.read_csv("data/tiny_label.csv", delimiter="	", index_col="jd.jd_id")
 # remove duplicate index
 data = data.loc[~data.index.duplicated(keep='first')]
@@ -79,6 +81,8 @@ for x, y in zip(data2['desc_clean'], data2['labels']):
     seg_result = a2g(seg_result)
     prop_labels = []
 
+    new_x = ''
+
     seg_word = ''
     properti = ''
     begin = True
@@ -99,6 +103,10 @@ for x, y in zip(data2['desc_clean'], data2['labels']):
         prop_labels.append(mark)
         prop_set.add(mark)
         seg_word = seg_word[1:]
+
+        new_x += x.upper() if upper_english else x
+
+    x = new_x
 
     processed_desc_w_prop.append((x, prop_labels))
 

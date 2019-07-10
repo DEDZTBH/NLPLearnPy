@@ -1,4 +1,6 @@
 import re
+import string
+import unicodedata
 import jieba.posseg as pseg
 
 with open('data/stopwords.txt', 'r', encoding='utf-8') as file:
@@ -14,8 +16,18 @@ def valid_label(l):
     return True
 
 
+normalize_punctuations_table = {ord(f): ord(t) for f, t in zip(
+    u'，。！？【】（）％＃＠＆１２３４５６７８９０',
+    u',.!?[]()%#@&1234567890')}
+
+
+def normalize_punctuations(str):
+    return unicodedata.normalize('NFKC', str).translate(normalize_punctuations_table)
+
+
 def desc_clean_clean(s):
-    s = re.sub(r'[0-9一二三四五六七八九][.、:：]', ' ', s)
+    s = normalize_punctuations(s)
+    s = re.sub(r'[0-9一二三四五六七八九][.、:]', '', s)
     s = re.sub(r'[-]{3,}|[*]{3,}', '', s)
     s = re.sub(r' ', '', s)
     return s
@@ -27,7 +39,7 @@ def filter_seg_result(pair):
            and (simplify_property(properti) not in stop_properties_general)
 
 
-sentence_break = list('。；！.;!')
+sentence_break = list('.;!')
 
 
 def write_to_file(fileloc, z, every_sentence=True):
@@ -78,3 +90,7 @@ def simplify_property(p):
         return p
 
     return p[0]
+
+
+def is_letter(c):
+    return c in string.ascii_letters
